@@ -14,10 +14,10 @@ grant-rag-mvp/
 ├── docs/
 │   ├── PRD.md
 │   │   └── Краткий PRD и продуктовые метрики
-│   ├── DATA_LAKE_LAYOUT.md
-│   │   └── Структура Data Lake
-│   └── EVALUATION.md
-│       └── Протокол оценки ML / RAG метрик
+│   ├── DATA Processing.md
+│   │   └── Структура хранения и обработки данных
+│   └── ML Manifest.md
+│       └── Описание ML части
 │
 ├── src/
 │   ├── main.py

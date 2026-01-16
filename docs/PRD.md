@@ -98,7 +98,7 @@
 ---
 
 ## 9. System Architecture (RAG)
-
+Краткая схема
 ```mermaid
 flowchart LR
     A[Application PDF] --> B[Chunking]
@@ -110,6 +110,65 @@ flowchart LR
     F --> H[Recommendations]
     F --> I[Confidence Score]
 ```    
+Подробная схема
+``` mermaid
+flowchart TB
+
+%% === UI Layer ===
+UI["Web UI<br/>эксперт: загрузка и оценка"]
+UI -->|HTTPS| API
+
+%% === API Layer ===
+API["FastAPI — RAG API<br/>
+endpoints: /analyze, /health<br/><br/>
+Orchestrator — RAG pipeline<br/>
+Validation — schema, citations, coverage<br/>
+Risk Calibrator — confidence score<br/>
+Versioning — prompt, embedding, index, config"]
+
+%% === ML / Infra Dependencies ===
+API --> EMB
+API --> VDB
+API --> LLM
+
+EMB["Embeddings<br/>SentenceTransformers"]
+VDB["Vector DB<br/>Qdrant, HNSW"]
+LLM["LLM Provider<br/>API or local"]
+
+EMB -->|embed query| CTX
+VDB -->|search top-k| CTX
+LLM -->|generate answer| CTX
+
+%% === RAG Context ===
+CTX["RAG Context Builder<br/>
+deduplicate chunks<br/>
+filters<br/>
+prompt template"]
+
+%% === Storage ===
+API --> DWH
+DWH -->|URIs and links| LAKE
+
+DWH["PostgreSQL — Core DWH<br/>
+applications metadata<br/>
+inference runs and versions<br/>
+expert feedback and override"]
+
+LAKE["Data Lake — MinIO or S3<br/>
+raw pdf and docx<br/>
+parsed text and sections<br/>
+chunks datasets<br/>
+rag runs traces<br/>
+calibrator artifacts"]
+
+%% === Observability ===
+API -.-> OBS
+
+OBS["Observability — optional MVP<br/>
+OpenTelemetry to Uptrace<br/>
+Grafana dashboards and alerts"]
+```
+
 ## 10. Trust / Risk Calibrator
 
 > **Научно значимый компонент системы**  
