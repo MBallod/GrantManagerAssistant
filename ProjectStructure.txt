@@ -1,0 +1,82 @@
+grant-rag-mvp/
+├── README.md
+│   └── Описание проекта, запуск, архитектура
+│
+├── .env.example
+│   └── Переменные окружения
+│
+├── docker-compose.yml
+│   └── API + Postgres + Qdrant + MinIO
+│
+├── pyproject.toml
+│   └── Зависимости и инструменты
+│
+├── docs/
+│   ├── PRD.md
+│   │   └── Краткий PRD и продуктовые метрики
+│   ├── DATA_LAKE_LAYOUT.md
+│   │   └── Структура Data Lake
+│   └── EVALUATION.md
+│       └── Протокол оценки ML / RAG метрик
+│
+├── src/
+│   ├── main.py
+│   │   └── FastAPI entrypoint и роуты
+│   ├── settings.py
+│   │   └── Конфигурация из env
+│   ├── schemas.py
+│   │   └── Pydantic DTO и схемы
+│   │
+│   ├── rag/
+│   │   ├── pipeline.py
+│   │   │   └── Orchestrator: embed → retrieve → prompt → LLM → validate → persist
+│   │   ├── chunking.py
+│   │   │   └── Chunking (size / overlap / sections)
+│   │   ├── retrieval.py
+│   │   │   └── Qdrant search (top-k, filters, dedup)
+│   │   ├── prompts.py
+│   │   │   └── Шаблоны промптов + формат JSON
+│   │   └── validation.py
+│   │       └── Citation validity + coverage + schema checks
+│   │
+│   ├── adapters/
+│   │   ├── llm.py
+│   │   │   └── Клиент LLM (retries / timeouts)
+│   │   ├── embedder.py
+│   │   │   └── SentenceTransformers embeddings (CPU / GPU)
+│   │   ├── vector_db.py
+│   │   │   └── Qdrant client (search / upsert)
+│   │   ├── dwh.py
+│   │   │   └── Postgres: applications / inference_runs / versions
+│   │   └── lake.py
+│   │       └── S3 / MinIO: raw / parsed / chunks / runs / models
+│   │
+│   └── calibrator/
+│       ├── features.py
+│       │   └── Фичи качества (retrieval / generation / input)
+│       ├── predict.py
+│       │   └── Risk score inference
+│       └── train.py
+│           └── Offline-обучение калибратора
+│
+├── scripts/
+│   ├── ingest_to_lake.py
+│   │   └── Загрузка PDF / DOCX в raw + manifest
+│   ├── parse_and_chunk.py
+│   │   └── raw → parsed + chunks
+│   ├── upsert_index.py
+│   │   └── chunks → Qdrant + index_version
+│   ├── eval_retrieval.py
+│   │   └── Precision@k, nDCG@k
+│   ├── bootstrap.sql
+│   │   └── Минимальные таблицы Postgres
+│   └── bootstrap_env.sh
+│       └── Buckets + SQL + smoke checks
+│
+└── tests/
+    ├── test_validation.py
+    │   └── validity / coverage / schema
+    ├── test_chunking.py
+    │   └── стабильность chunking
+    └── test_features.py
+        └── фичи калибратора
